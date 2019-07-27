@@ -79,9 +79,6 @@ always @ (posedge clk)
   begin
     SEL_REG[31:0]   <= 0;
     reg_0_in_ok     <= 1'b0;
-	 reg_1_in_ok     <= 1'b0;
-	 reg_2_in_ok     <= 1'b0;
-	 reg_3_in_ok     <= 1'b0;
   end
   else if (reg_2_in_ok)
   begin
@@ -90,27 +87,28 @@ always @ (posedge clk)
   else if (sel_reg_sel)
   begin
     if (valid_pci)
-    begin
-      SEL_REG_[31:0] <= ad_to_tuvv[31:0];
-      SEL_REG[31:0]  <= 32'b0;
-      reg_0_in_ok <= 1'b1;
-		reg_1_in_ok     <= 1'b0;
-		reg_2_in_ok     <= 1'b0;
-		reg_3_in_ok     <= 1'b0;
-    end 
-  end else if (reg_0_in_ok==1'b1) begin
-    reg_1_in_ok <= 1'b1;
-	 reg_0_in_ok <= 1'b0;
-  end else if (reg_1_in_ok==1'b1) begin
-    reg_2_in_ok <= 1'b1;
-	 reg_1_in_ok <= 1'b0;
-  end else if (reg_2_in_ok==1'b1) begin
-    reg_3_in_ok <= 1'b1;
-	 reg_2_in_ok <= 1'b0;
-  end else if (reg_3_in_ok==1'b1) begin
-    reg_3_in_ok <= 1'b0;
-	 SEL_REG[31:0] <= SEL_REG_[31:0];
+  begin
+    SEL_REG_[31:0] <= ad_to_tuvv[31:0];
+    SEL_REG[31:0]  <= 32'b0;
+    reg_0_in_ok <= 1'b1;
+  end else if (reg_0_in_ok==1'b1)
+    reg_0_in_ok <= 1'b0;
   end
+
+always @ (posedge clk)
+  if(!rst_)
+  begin
+    reg_1_in_ok     <= 1'b0;
+    reg_2_in_ok     <= 1'b0;
+    reg_3_in_ok     <= 1'b0;
+  end else
+  begin
+    reg_1_in_ok     <= reg_0_in_ok;
+    reg_2_in_ok     <= reg_1_in_ok;
+    reg_3_in_ok     <= reg_2_in_ok;
+  end
+  
+assign reg_in_ok_str = reg_0_in_ok && !reg_3_in_ok;
 
 always @ (posedge clk) begin
   if (!rst_) begin
