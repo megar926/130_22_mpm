@@ -81,8 +81,8 @@ end
 always @ (posedge clk)
   if (!rst_)
   begin
-    DATA_IN_SEL[31:0]     <= 0;
-    DATA_IN_SEL_flag      <= 0;
+    DATA_IN_SEL[31:0]     <= {32{1'h0}};
+    DATA_IN_SEL_flag      <= 1'b0;
     DATA_IN_SEL_del[31:0] <= {32{1'h0}};
   end
   else if (data_in_1_sel)
