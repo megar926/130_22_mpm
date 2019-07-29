@@ -161,29 +161,29 @@ always @ (posedge clk)
 		en2_9 <= 1'b0;
 		en2_10 <= 1'b0;
 		a2_sel_flag <= 1'b0;
-	 end else if (DATA_IN_SEL`En == 1'b1)
+	 end else if (DATA_IN_SEL`En == 1'b1 && a2_sel_flag == 0)
 	 begin
-	   a2_0 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][0];
+	  a2_0 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][0];
 		a2_1 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][1];
 		a2_2 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][2];
 		a2_3 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][3];
 		a2_sel_flag <= 1'b1;
+	 
 	 end else if (a2_sel_flag == 1'b1)
 	 begin
-	   a2_sel_flag <= 1'b0;
-	   en2_1 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][4];
-		en2_2 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][5];
-		en2_3 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][6];
-		en2_4 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][7];
-		en2_5 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][8];
-		en2_6 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][9];
-		en2_7 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][10];
-		en2_8 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][11];
-		en2_9 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][12];
-		en2_10 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][13];
-	 end
-  end
-	
+	    //a2_sel_flag <= 1'b0;
+	    en2_1 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][4];
+	    en2_2 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][5];
+	    en2_3 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][6];
+	    en2_4 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][7];
+	    en2_5 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][8];
+	    en2_6 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][9];
+	    en2_7 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][10];
+	    en2_8 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][11];
+	    en2_9 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][12];
+	    en2_10 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][13];
+	  end
+  end	
 /*  
 assign a2_0   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][0] :1'b0;
 assign a2_1   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][1] :1'b0;
