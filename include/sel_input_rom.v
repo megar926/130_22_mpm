@@ -29,7 +29,7 @@ data_in_1_sel_active
 );
 
 parameter N = 25*(`DELAY_MKS);
-parameter C = (`DELAY_MKS_CH);
+parameter C = (`DELAY_MKS_CH);//if 1 - 2 tacts, if 2 - 4 tacts, if 4 -  8 tacts, if 8 - 16 tacts
 integer delay = 2;
 reg [31:0] DATA_IN_SEL;
 
@@ -81,8 +81,8 @@ end
 always @ (posedge clk)
   if (!rst_)
   begin
-    DATA_IN_SEL[31:0]     <= {32{1'h0}};
-    DATA_IN_SEL_flag      <= 1'b0;
+    DATA_IN_SEL[31:0]     <= 0;
+    DATA_IN_SEL_flag      <= 0;
     DATA_IN_SEL_del[31:0] <= {32{1'h0}};
   end
   else if (data_in_1_sel)
@@ -93,7 +93,7 @@ always @ (posedge clk)
       DATA_IN_SEL_del[31:0] <= ad_to_tuvv[31:0];
       DATA_IN_SEL_flag      <= 1'b1;
     end
-  end  else if (count_del == 0)
+  end  else if (count_del == 0 || (data_in_1_sel_active == 1'b0))
     begin
       DATA_IN_SEL_flag <= 1'b0;
       DATA_IN_SEL      <= DATA_IN_SEL_del;
@@ -105,7 +105,7 @@ always @ (posedge clk)
     if(!rst_ || !DATA_IN_SEL_flag) 
       begin
         count_del <= {C{1'h1}};
-      end else if (DATA_IN_SEL_flag)
+      end else if (DATA_IN_SEL_flag && data_in_1_sel_active == 1'b1)
       begin
         count_del <= count_del - 1'b1;
       end
@@ -171,7 +171,6 @@ always @ (posedge clk)
 	 
 	 end else if (a2_sel_flag == 1'b1)
 	 begin
-	    //a2_sel_flag <= 1'b0;
 	    en2_1 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][4];
 	    en2_2 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][5];
 	    en2_3 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][6];
