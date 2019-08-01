@@ -716,7 +716,7 @@ relay_reg relay_reg_ (
 .rst_                (rst_),
 .valid_pci           (valid_pci),
 .ad_to_tuvv          (ad_to_tuvv),
-//.ad_from_tuvv        (ad_from_tuvv),
+.ad_from_tuvv        (ad_from_tuvv),
 .rd_wr               (rd_wr),
 .relay_reg_sel       (relay_reg_sel),
 .conn_mult           (conn_mult),

@@ -1,6 +1,7 @@
 `timescale 1ns/1ns
 `include "g_define.vh"
 `define PAUSE //pause between switches = N
+//`define SIM
 module sel_input_rom (
 //SIGNALS FROM PCI CONTROLLER
 clk,
@@ -33,6 +34,8 @@ parameter C = (`DELAY_MKS_CH);//if 1 - 2 tacts, if 2 - 4 tacts, if 4 -  8 tacts,
 integer delay = 2;
 reg [31:0] DATA_IN_SEL;
 
+
+
 input clk;
 input rst_;
 input valid_pci;
@@ -55,6 +58,7 @@ output reg en2_8;
 output reg en2_9;
 output reg en2_10;
 output data_in_1_sel_active;
+wire [14:0] data_out_rom;
 reg [($clog2(C) - 1):0]count_del;
 wire  [9:0]en2_reg;
 reg  [N-1:0] r_reg;
@@ -69,13 +73,20 @@ reg DATA_IN_SEL_flag;
 reg [31:0] DATA_IN_SEL_del;
 `endif
 
+`ifdef SIM
 reg           [13:0] rom_addr_mux       [0:156];               // address and type of calibr channels
-
 initial
 begin
-  $readmemb ("rom/addr.txt",rom_addr_mux);
-  $display("%b", rom_addr_mux[0][4]);
+  $readmemb ("C:/Users/TEST/Documents/questa_prj/quartus_13_prj/pci_uart_mb13022/rom/addr.txt",rom_addr_mux);
+  //$display("%b", rom_addr_mux[0][4]);
 end
+`else
+sel_input_mux_rom sel_input_mux_rom_(
+.clock       (clk),
+.address     (DATA_IN_SEL_del`CH_IN_SEL),
+.q           (data_out_rom)
+);
+`endif
 
 `ifdef PAUSE
 always @ (posedge clk)
@@ -125,6 +136,7 @@ always @ (posedge clk)
   end
   `endif
 
+ `ifdef SIM
  always @ (posedge clk) 
   begin
     if(!rst_)
@@ -183,22 +195,68 @@ always @ (posedge clk)
 	    en2_10 <= rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][13];
 	  end
   end	
-/*  
-assign a2_0   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][0] :1'b0;
-assign a2_1   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][1] :1'b0;
-assign a2_2   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][2] :1'b0;
-assign a2_3   = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][3] :1'b0;
-assign en2_1  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][4] :1'b0;
-assign en2_2  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][5] :1'b0;
-assign en2_3  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][6] :1'b0;
-assign en2_4  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][7] :1'b0;
-assign en2_5  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][8] :1'b0;
-assign en2_6  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][9] :1'b0;
-assign en2_7  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][10]:1'b0;
-assign en2_8  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][11]:1'b0;
-assign en2_9  = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][12]:1'b0;
-assign en2_10 = (DATA_IN_SEL`En==1'b1 && rst_)? rom_addr_mux[DATA_IN_SEL`CH_IN_SEL][13]:1'b0;
-*/
+`else
+always @ (posedge clk) 
+  begin
+    if(!rst_)
+	 begin
+	   a2_0 <= 1'b0;
+		a2_1 <= 1'b0;
+		a2_2 <= 1'b0;
+		a2_3 <= 1'b0;
+		en2_1 <= 1'b0;
+		en2_2 <= 1'b0;
+		en2_3 <= 1'b0;
+		en2_4 <= 1'b0;
+		en2_5 <= 1'b0;
+		en2_6 <= 1'b0;
+		en2_7 <= 1'b0;
+		en2_8 <= 1'b0;
+		en2_9 <= 1'b0;
+		en2_10 <= 1'b0;
+		a2_sel_flag <= 1'b0;
+	 end else if (DATA_IN_SEL`En == 1'b0)
+	 begin
+	   a2_0 <= 1'b0;
+		a2_1 <= 1'b0;
+		a2_2 <= 1'b0;
+		a2_3 <= 1'b0;
+		en2_1 <= 1'b0;
+		en2_2 <= 1'b0;
+		en2_3 <= 1'b0;
+		en2_4 <= 1'b0;
+		en2_5 <= 1'b0;
+		en2_6 <= 1'b0;
+		en2_7 <= 1'b0;
+		en2_8 <= 1'b0;
+		en2_9 <= 1'b0;
+		en2_10 <= 1'b0;
+		a2_sel_flag <= 1'b0;
+	 end else if (DATA_IN_SEL`En == 1'b1 && a2_sel_flag == 0)
+	 begin
+	   a2_0 <= data_out_rom[0];
+		a2_1 <= data_out_rom[1];
+		a2_2 <= data_out_rom[2];
+		a2_3 <= data_out_rom[3];
+		a2_sel_flag <= 1'b1;
+		en2_1 <= data_out_rom[4];
+	 
+	 end else if (a2_sel_flag == 1'b1)
+	 begin
+	    //en2_1 <= data_out_rom[4];
+	    en2_2 <= data_out_rom[5];
+	    en2_3 <= data_out_rom[6];
+	    en2_4 <= data_out_rom[7];
+	    en2_5 <= data_out_rom[8];
+	    en2_6 <= data_out_rom[9];
+	    en2_7 <= data_out_rom[10];
+	    en2_8 <= data_out_rom[11];
+	    en2_9 <= data_out_rom[12];
+	    en2_10 <= data_out_rom[13];
+	  end
+  end	
+`endif
+
 assign en2_reg = {en2_1, en2_2, en2_3, en2_4, en2_5, en2_6, en2_7, en2_8, en2_9, en2_10};
 
 assign ad_from_tuvv[31:0] = (!rd_wr & data_in_1_sel) ? {23'b0, data_in_1_sel_active ,DATA_IN_SEL`En ,DATA_IN_SEL`CH_IN_SEL} : 32'bz;
