@@ -2,6 +2,8 @@
 `include "g_define.vh"
 `define PAUSE //pause between switches = N
 //`define SIM
+//`define STAT //View stat dan in output transfer packet
+
 module sel_input_rom (
 //SIGNALS FROM PCI CONTROLLER
 clk,
@@ -77,7 +79,7 @@ reg [31:0] DATA_IN_SEL_del;
 reg           [13:0] rom_addr_mux       [0:156];               // address and type of calibr channels
 initial
 begin
-  $readmemb ("C:/Users/TEST/Documents/questa_prj/quartus_13_prj/pci_uart_mb13022/rom/addr.txt",rom_addr_mux);
+  $readmemb ("rom/addr.txt",rom_addr_mux);
   //$display("%b", rom_addr_mux[0][4]);
 end
 `else
@@ -239,11 +241,11 @@ always @ (posedge clk)
 		a2_2 <= data_out_rom[2];
 		a2_3 <= data_out_rom[3];
 		a2_sel_flag <= 1'b1;
-		en2_1 <= data_out_rom[4];
+		//en2_1 <= data_out_rom[4];
 	 
 	 end else if (a2_sel_flag == 1'b1)
 	 begin
-	    //en2_1 <= data_out_rom[4];
+	    en2_1 <= data_out_rom[4];
 	    en2_2 <= data_out_rom[5];
 	    en2_3 <= data_out_rom[6];
 	    en2_4 <= data_out_rom[7];
@@ -259,7 +261,12 @@ always @ (posedge clk)
 
 assign en2_reg = {en2_1, en2_2, en2_3, en2_4, en2_5, en2_6, en2_7, en2_8, en2_9, en2_10};
 
-assign ad_from_tuvv[31:0] = (!rd_wr & data_in_1_sel) ? {23'b0, data_in_1_sel_active ,DATA_IN_SEL`En ,DATA_IN_SEL`CH_IN_SEL} : 32'bz;
+`ifdef STAT
+assign ad_from_tuvv[31:0] = (!rd_wr & data_in_1_sel) ? {en2_8, en2_7, en2_6, en2_5, en2_4, en2_3, en2_2, en2_1,
+                             14'b0, data_in_1_sel_active ,DATA_IN_SEL`En ,DATA_IN_SEL`CH_IN_SEL} : 32'bz;
+`else
+assign ad_from_tuvv[31:0] = (!rd_wr & data_in_1_sel) ?{23'b0, data_in_1_sel_active ,DATA_IN_SEL`En ,DATA_IN_SEL`CH_IN_SEL} : 32'bz;
+`endif
 
 assign data_in_1_sel_active = |en2_reg || !s_out;
 
