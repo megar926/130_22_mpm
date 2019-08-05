@@ -384,6 +384,7 @@ wire conn_4wire_active;
 wire set_abc;
 wire conn_mult_active;
 wire por_rst_;
+wire sel_reg_sel_active;
 assign adc1_wb = 1'b1;
 assign set_a = set_abc;
 assign set_b = set_abc;
@@ -522,7 +523,8 @@ adr_sel adr_sel_inst_1 (
 .data_in_1_sel_active   (data_in_1_sel_active),
 .relay_reg_sel          (relay_reg_sel),
 .conn_4wire_active      (conn_4wire_active),
-.conn_mult_active      (conn_mult_active)
+.conn_mult_active      (conn_mult_active),
+.sel_reg_sel_active     (sel_reg_sel_active)
 );
 
 //data_in_out_1 data_in_out_inst_1(
@@ -689,7 +691,11 @@ sel_reg_del sel_reg_del_inst_1(
 //SEL REGISTER
 .sel_reg_sel       (sel_reg_sel),
 //BUSY POTENTIOMETER SIGNAL
-.pot_busy          (pot_busy)
+.pot_busy          (pot_busy),
+//BUSY EN3 signal
+.sel_reg_sel_active (sel_reg_sel_active),
+//INPUT RELAY_MULT SIGNAL BUSY
+.conn_mult_active   (conn_mult_active)
 );
 `endif
 

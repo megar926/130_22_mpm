@@ -29,7 +29,8 @@ r_err_sel,
 r_test_sel,
 relay_reg_sel,
 conn_4wire_active,
-conn_mult_active
+conn_mult_active,
+sel_reg_sel_active
 );
 
 input clk;
@@ -44,6 +45,7 @@ input data_in_1_sel_active;
 input in_1_2_sel_active;
 input conn_4wire_active;
 input conn_mult_active;
+input sel_reg_sel_active;
 output reg [31:0] ADRESS;
 output tuvv_ready;
 output data_out_sel;
@@ -79,7 +81,7 @@ assign c_imsh_sel =      (ADRESS[19:4] == `C_IMSH) ? 1'b1 : 1'b0;
 assign r_err_sel =       (ADRESS[19:4] == `R_ERR) ? 1'b1 : 1'b0;
 assign r_test_sel =      (ADRESS[19:4] == `R_TEST) ? 1'b1 : 1'b0;
 //relay_reg.v
-assign relay_reg_sel =   (!in_1_2_sel_active && !data_in_1_sel_active && ADRESS[19:4] == `RELAY_CTRL) ? 1'b1 : 1'b0;	
+assign relay_reg_sel =   (!in_1_2_sel_active && !data_in_1_sel_active && !sel_reg_sel_active && ADRESS[19:4] == `RELAY_CTRL) ? 1'b1 : 1'b0;	
 
 always @ (posedge clk)//Формирование адреса
   if(!rst_)

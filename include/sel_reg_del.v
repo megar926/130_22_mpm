@@ -25,8 +25,12 @@ a6_2,
 en_izm,
 sel_reg_sel,
 //BUSY POTENTIOMETER SIGNAL
-pot_busy
+pot_busy,
+//active EN_3[0] signal
+sel_reg_sel_active,
+conn_mult_active
 );
+parameter N = 25*(`DELAY_MKS);
 
 input clk;
 input rst_;
@@ -37,6 +41,7 @@ output [31:0] ad_from_tuvv;
 input rd_wr;
 input send_ok_strobe;
 input sel_reg_sel;
+input conn_mult_active;
 output a3_0;
 output a3_1;
 output a3_2;
@@ -49,6 +54,7 @@ output a6_2;
 output en_izm;
 output [15:0] dat_spi_out;
 output reg send_data_spi;
+output sel_reg_sel_active;
 
 reg [2:0] a3_reg;
 reg [2:0] a6_reg;
@@ -59,8 +65,14 @@ reg reg_1_in_ok;
 reg reg_2_in_ok;
 reg reg_3_in_ok;
 wire reg_in_ok_str;
+reg en3_reg_0;
+reg en3_reg_1;
+wire en3_strobe;
 reg [31:0] SEL_REG;
 reg [31:0] SEL_REG_;
+reg  [N-1:0] r_reg;
+wire [N-1:0] r_next;
+wire s_out;
 //assign sel_reg_sel = (ADRESS[19:4] == 16'h1360) ? 1'b1 : 1'b0;
 assign ad_from_tuvv[31:0] = (!rd_wr & sel_reg_sel) ? {SEL_REG[31:15] ,pot_busy ,SEL_REG[13:0]} : 32'bz;
 assign dat_spi_out = (SEL_REG`A3_MUX == (5'd10) || SEL_REG`A3_MUX == (5'd11) || SEL_REG`A3_MUX == (5'd12))?SEL_REG`POT_DAN_OUT:16'b0;
@@ -121,27 +133,27 @@ always @ (posedge clk) begin
     case(SEL_REG`A3_MUX)
       5'd0: begin
               a3_reg    <= 3'd0;     //dac_pos   //chanel 1// turn on time after en == 1, ~140 ns max
-                if(a3_reg==3'd0)
+                if(a3_reg==3'd0 && !conn_mult_active)
                   en3_reg   <= {1'b0, 1'b0, 1'b1};
             end
       5'd1: begin      //A3/A2/A1/A0
               a3_reg    <= 3'd1;     //dac_neg   //chanel 1
-                if(a3_reg==3'd1)
+                if(a3_reg==3'd1 && !conn_mult_active)
                   en3_reg   <= {1'b0, 1'b0, 1'b1};
             end
       5'd2: begin      //A3/A2/A1/A0
               a3_reg    <= 3'd2;     //gnd_r   //chanel 1
-                if(a3_reg==3'd2)
+                if(a3_reg==3'd2 && !conn_mult_active)
                   en3_reg   <= {1'b0, 1'b0, 1'b1};
             end
       5'd3: begin      //A3/A2/A1/A0
               a3_reg    <= 3'd3;     //12v_filt   //chanel 1
-                if(a3_reg==3'd3)
+                if(a3_reg==3'd3 && !conn_mult_active)
                   en3_reg   <= {1'b0, 1'b0, 1'b1};
             end
       5'd4: begin      //A3/A2/A1/A0
               a3_reg    <= 3'd4;     //-12v_filt   //chanel 1
-                if(a3_reg==3'd4)
+                if(a3_reg==3'd4 && !conn_mult_active)
                   en3_reg   <= {1'b0, 1'b0, 1'b1};
             end
       5'd5: begin      //A3/A2/A1/A0///////////////////////////////D19
@@ -252,5 +264,41 @@ always @ (posedge clk)
     en_izm    <= 1'b0;
   end
 end
+
+//////////////////////////delay after turn off///////////////////////////
+
+assign sel_reg_sel_active = |en3_reg[0] || !s_out;
+
+always @ (posedge clk) begin
+  if (!rst_)
+    begin
+      en3_reg_0 <= 1'b0;
+      en3_reg_1 <= 1'b0;
+    end else
+    begin
+      en3_reg_0 <= |en3_reg[0];
+      en3_reg_1 <= en3_reg_0;
+    end
+  end
+  
+assign  en3_strobe =  |en3_reg && !en3_reg_1;
+
+always @(posedge clk)
+   begin
+      if (!rst_)
+        begin 
+          r_reg <= {N{1'h1}};
+        end else 
+      if (en3_strobe)
+        begin
+          r_reg <= {N{1'h0}};
+      end else if(SEL_REG`En_A3_MUX==1'b0) 
+      begin      
+          r_reg <= r_next;
+   	  end
+ 	  end
+ 
+	assign r_next = {~(|en3_reg), r_reg[N-1:1]};
+	assign s_out = r_reg[0];
 
 endmodule

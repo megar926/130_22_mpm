@@ -730,7 +730,7 @@ end
 	assign set_r_d        = (rst_) ? SENS`SET3_CHECK_D  : 1'b0;
 	assign set_gnd_d      = (rst_) ? SENS`SET4_CHECK_D  : 1'b0;
 
-  assign set_abc = (rst_ && (|SENS_del[25:0] == 1'b0)) ? 	SENS`SET_A_B_C : 1'b0;
+  assign set_abc = (rst_ && (|SENS_del[25:0] == {26{1'b0}})) ? 	SENS`SET_A_B_C : 1'b0;
 	assign A4_0    = (rst_) ? SENS`A4_0 : 1'b0;
 	assign A4_1    = (rst_) ? SENS`A4_1 : 1'b0;
 	assign A4_2    = (rst_) ? SENS`A4_2 : 1'b0;
