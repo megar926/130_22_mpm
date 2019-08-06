@@ -89,7 +89,8 @@ assign en3_3 = en3_reg [2];
 always @ (posedge clk)
   if (!rst_)
   begin
-    SEL_REG[31:0]   <= 0;
+    SEL_REG[31:0]   <= {32{1'b0}};
+    SEL_REG_[31:0]  <= {32{1'b0}};
     reg_0_in_ok     <= 1'b0;
   end
   else if (reg_2_in_ok)

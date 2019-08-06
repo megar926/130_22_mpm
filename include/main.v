@@ -493,7 +493,11 @@ controller controller_inst1(
 .r_test_sel         (r_test_sel),
 .in_1_2_sel_active  (in_1_2_sel_active),
 .adc_test           (adc_test),
-.en_prb             (en_prb)
+.en_prb             (en_prb),
+.a4_0               (a4_0),
+.a4_1               (a4_1),
+.a4_2               (a4_2),
+.a4_3               (a4_3),
 );
 
 adr_sel adr_sel_inst_1 (

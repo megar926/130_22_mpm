@@ -207,7 +207,7 @@ wire en2_strobe;
 	reg err_check;
 	reg fake_reg;
 	reg SENS_flag;
-	reg [30:0] SENS_del;
+	reg [31:0] SENS_del;
 	reg wrb_delay;
 
 	reg dac_wr;
@@ -222,7 +222,7 @@ wire en2_strobe;
 	
 	reg [19:0] IN_1;
 	reg [19:0] IN_2;
-	reg [30:0]  SENS;
+	reg [31:0]  SENS;
 	reg [8:0] C_IMSH;
 	reg [7:0] R_ERR;
 	reg [31:0] R_TEST;
@@ -251,7 +251,7 @@ wire en2_strobe;
 	
 	assign ad_from_tuvv[31:0] = (!rd_wr & in_1_sel) ? {14'b0, in_1_2_sel_active, IN_1 [16:0]} :
 								(!rd_wr & in_2_sel) ? IN_2 [19:0] :
-								(!rd_wr & sens_sel) ? SENS [7:0] :
+								(!rd_wr & sens_sel) ? SENS [31:0] :
 								(!rd_wr & c_imsh_sel) ? C_IMSH [8:0] :
 								(!rd_wr & r_err_sel) ? R_ERR [7:0] :
 								(!rd_wr & r_test_sel) ? R_TEST [31:0] : 32'bz;
@@ -676,21 +676,21 @@ end
 	always @ (posedge clk)
 	if(!rst_)
 		begin
-			SENS[30:0] <= #delay 0;
-			SENS_del [30:0] <= #delay 0;
+			SENS[31:0] <= #delay 0;
+			SENS_del [31:0] <= #delay 0;
 			SENS_flag <= #delay 0;
 		end
 	else if (sens_sel)
 		begin
 			if (valid_pci & !a_d)
 				begin
-					SENS[30:0] <= #delay 0;
-					SENS_del[30:0] <= #delay ad_to_tuvv[30:0];
+					SENS[31:0] <= #delay 0;
+					SENS_del[31:0] <= #delay ad_to_tuvv[31:0];
 					SENS_flag <= #delay 1;
 				end
 			else if (SENS_flag)
 				begin
-					SENS[30:0] <= #delay SENS_del[30:0];
+					SENS[31:0] <= #delay SENS_del[31:0];
 					SENS_flag <= #delay 0;
 				end
 		end
@@ -731,10 +731,10 @@ end
 	assign set_gnd_d      = (rst_) ? SENS`SET4_CHECK_D  : 1'b0;
 
   assign set_abc = (rst_ && (|SENS_del[25:0] == {26{1'b0}})) ? 	SENS`SET_A_B_C : 1'b0;
-	assign A4_0    = (rst_) ? SENS`A4_0 : 1'b0;
-	assign A4_1    = (rst_) ? SENS`A4_1 : 1'b0;
-	assign A4_2    = (rst_) ? SENS`A4_2 : 1'b0;
-	assign A4_3    = (rst_) ? SENS`A4_3 : 1'b0;
+	assign a4_0    = (rst_) ? SENS`A4_0 : 1'b0;
+	assign a4_1    = (rst_) ? SENS`A4_1 : 1'b0;
+	assign a4_2    = (rst_) ? SENS`A4_2 : 1'b0;
+	assign a4_3    = (rst_) ? SENS`A4_3 : 1'b0;
   assign en_prb   = (rst_) ? SENS`EN_RB: 1'b0;
 	
 	

@@ -49,7 +49,7 @@ reg conn_mult_reg_0;
 reg conn_mult_reg_1;
 wire conn_mult_strobe;
 
-assign ad_from_tuvv[31:0] = (!rd_wr & relay_reg_sel) ? {RELAY_REG [31:0]} : 32'bz;
+assign ad_from_tuvv[31:0] = (!rd_wr & relay_reg_sel) ? {RELAY_REG [31:4], conn_4wire_active, conn_mult_active, RELAY_REG[1], RELAY_REG[0]} : 32'bz;
 
 always @ (posedge clk)
   if (!rst_)
@@ -74,18 +74,18 @@ always @ (posedge clk) begin
 	  conn_mult <= 1'b0;
 	  conn_4wire<= 1'b0;
 	end else
-  if (RELAY_REG`ConnMult == 1'b0 && RELAY_REG`Conn4wire == 1'b1)
+  if (RELAY_REG`ConnMult == 1'b0 && RELAY_REG`Conn4wire == 1'b1 && !conn_mult_active)
     begin
 	  conn_4wire<= 1'b1;
 	  conn_mult <= 1'b0;
 	end else 
-  if (RELAY_REG`ConnMult == 1'b1 && RELAY_REG`Conn4wire == 1'b0)
+  if (RELAY_REG`ConnMult == 1'b1 && RELAY_REG`Conn4wire == 1'b0 && !conn_4wire_active)
   begin
 	  conn_4wire<= 1'b0;
 	  conn_mult <= 1'b1;
   end else
     begin
-      conn_4wire<= 1'b0;
+    conn_4wire<= 1'b0;
 	  conn_mult <= 1'b0;   
     end
 end	
