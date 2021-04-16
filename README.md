@@ -1,3 +1,3 @@
-### MPM13022 SERIAL TESTING
+MPM13022 SERIAL TESTING
 Тестирование проекта модуля МПМ13022 с помощью моста UART <----> PCI
 
